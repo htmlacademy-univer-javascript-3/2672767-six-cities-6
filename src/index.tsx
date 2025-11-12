@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './components/app/app.tsx';
+import Offer from './types/offer.tsx';
 
 const offers: Array<Offer> = [
   {
