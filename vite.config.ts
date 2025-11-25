@@ -12,5 +12,5 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
   },
-  // base: '/react-six-cities/'
+  base: '/react-six-cities/'
 });
