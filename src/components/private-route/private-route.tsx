@@ -6,7 +6,7 @@ type PrivateRouteProps = {
 };
 
 const PrivateRoute: FC<PrivateRouteProps> = ({children}) => {
-  const isAuth = false;
+  const isAuth = true;
 
   return (isAuth ? children : <Navigate to="/login" replace/>);
 };

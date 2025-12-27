@@ -8,10 +8,10 @@ import Favorites from '../../pages/favorites';
 import OfferPage from '../../pages/offer';
 import NotFound from '../../pages/not-found';
 
-import type Offer from '../../types/offer';
+import {OfferShort} from '../../types/offer.tsx';
 
 interface AppProps {
-  offers: Offer[];
+  offers: OfferShort[];
 }
 
 const App: FC<AppProps> = ({offers}) => (
@@ -23,11 +23,11 @@ const App: FC<AppProps> = ({offers}) => (
         path="/favorites"
         element={
           <PrivateRoute>
-            <Favorites/>
+            <Favorites offers={offers}/>
           </PrivateRoute>
         }
       />
-      <Route path="/offer/:id" element={<OfferPage/>}/>
+      <Route path="/offer/:id" element={<OfferPage offers={offers}/>}/>
 
       <Route path="*" element={<NotFound/>}/>
     </Routes>
