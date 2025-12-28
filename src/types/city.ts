@@ -1,8 +1,6 @@
+import {MapLocation} from './map-location.ts';
+
 export interface City {
   name: string;
-  location: {
-    latitude: number;
-    longitude: number;
-    zoom: number;
-  };
+  location: MapLocation;
 }

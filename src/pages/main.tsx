@@ -2,6 +2,7 @@ import {FC, useCallback, useState} from 'react';
 
 import OffersList from '../components/offers-list/offers-list.tsx';
 import Header from '../components/header/header.tsx';
+import Map from '../components/map/map.tsx';
 
 import {OfferShort} from '../types/offer.tsx';
 
@@ -87,7 +88,7 @@ const MainPage: FC<MainPageProps> = ({offers}) => {
               />
             </section>
             <div className="cities__right-section">
-              <section className="cities__map map"></section>
+              <Map offers={offers} activeOfferId={activeOfferId}/>
             </div>
           </div>
         </div>

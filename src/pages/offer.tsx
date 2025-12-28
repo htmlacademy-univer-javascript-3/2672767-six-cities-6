@@ -3,9 +3,10 @@ import {useParams} from 'react-router-dom';
 
 import Header from '../components/header/header.tsx';
 import OffersList from '../components/offers-list/offers-list.tsx';
+import ReviewForm from '../components/comment-form/comment-form.tsx';
+import Map from '../components/map/map.tsx';
 
 import {OfferShort} from '../types/offer.tsx';
-import ReviewForm from '../components/comment-form/comment-form.tsx';
 
 interface OfferPageProps {
   offers: OfferShort[];
@@ -177,7 +178,11 @@ const OfferPage: FC<OfferPageProps> = ({offers}) => {
               </section>
             </div>
           </div>
-          <section className="offer__map map"></section>
+          <section className="offer__map">
+
+            <Map offers={offers} activeOfferId={id}/>
+
+          </section>
         </section>
         <div className="container">
           <section className="near-places places">
