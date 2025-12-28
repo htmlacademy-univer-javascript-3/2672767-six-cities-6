@@ -2,11 +2,14 @@ import {FC} from 'react';
 import {useParams} from 'react-router-dom';
 
 import Header from '../components/header/header.tsx';
+import ReviewsList from '../components/reviews-list/reviews-list.tsx';
+import ReviewForm from '../components/review-form/review-form.tsx';
 import OffersList from '../components/offers-list/offers-list.tsx';
-import ReviewForm from '../components/comment-form/comment-form.tsx';
 import Map from '../components/map/map.tsx';
 
-import {OfferShort} from '../types/offer.tsx';
+import {OfferShort} from '../types/offer.ts';
+import {reviews} from '../mocks/reviews.ts';
+
 
 interface OfferPageProps {
   offers: OfferShort[];
@@ -144,6 +147,7 @@ const OfferPage: FC<OfferPageProps> = ({offers}) => {
                 </div>
               </div>
               <section className="offer__reviews reviews">
+                <ReviewsList reviews={reviews}/>
                 <h2 className="reviews__title">Reviews &middot; <span className="reviews__amount">1</span></h2>
                 <ul className="reviews__list">
                   <li className="reviews__item">
