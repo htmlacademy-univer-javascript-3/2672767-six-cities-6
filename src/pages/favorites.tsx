@@ -1,5 +1,5 @@
 import {FC} from 'react';
-import {OfferShort} from '../types/offer.tsx';
+import {OfferShort} from '../types/offer.ts';
 import OffersList from '../components/offers-list/offers-list.tsx';
 import Header from '../components/header/header.tsx';
 

@@ -4,7 +4,7 @@ import OffersList from '../components/offers-list/offers-list.tsx';
 import Header from '../components/header/header.tsx';
 import Map from '../components/map/map.tsx';
 
-import {OfferShort} from '../types/offer.tsx';
+import {OfferShort} from '../types/offer.ts';
 
 interface MainPageProps {
   offers: OfferShort[];

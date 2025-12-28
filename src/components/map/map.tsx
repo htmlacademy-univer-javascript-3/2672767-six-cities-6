@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 
 
 import useMap from '../hooks/use-map.ts';
-import {OfferShort} from '../../types/offer.tsx';
+import {OfferShort} from '../../types/offer.ts';
 import {MapLocation} from '../../types/map-location.ts';
 
 type MapProps = {

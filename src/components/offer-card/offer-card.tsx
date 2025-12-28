@@ -1,7 +1,7 @@
 import {FC, useCallback} from 'react';
 import {Link} from 'react-router-dom';
 
-import {OfferShort} from '../../types/offer.tsx';
+import {OfferShort} from '../../types/offer.ts';
 
 type OfferCardVariant = 'cities' | 'favorites' | 'near';
 

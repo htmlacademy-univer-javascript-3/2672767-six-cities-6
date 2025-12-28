@@ -1,6 +1,6 @@
 import {FC} from 'react';
 import OfferCard from '../offer-card/offer-card.tsx';
-import {OfferShort} from '../../types/offer.tsx';
+import {OfferShort} from '../../types/offer.ts';
 
 type OffersListVariant = 'cities' | 'favorites' | 'near';
 

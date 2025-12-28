@@ -8,7 +8,7 @@ import Favorites from '../../pages/favorites';
 import OfferPage from '../../pages/offer';
 import NotFound from '../../pages/not-found';
 
-import {OfferShort} from '../../types/offer.tsx';
+import {OfferShort} from '../../types/offer.ts';
 
 interface AppProps {
   offers: OfferShort[];
