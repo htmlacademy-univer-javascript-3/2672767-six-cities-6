@@ -3,9 +3,13 @@ import {RootState} from '../index.ts';
 import {selectCurrentCity} from './city-selectors.ts';
 import {OfferShort} from '../../types/offer.ts';
 import {SortingType} from '../../types/sorting.ts';
+import {RequestStatuses} from '../../const/api.ts';
 
 export const selectOffersState = (state: RootState) => state.offersList;
 export const selectOffers = (state: RootState) => selectOffersState(state).items;
+export const selectOffersStatus = (state: RootState) =>
+  selectOffersState(state).status;
+export const selectOffersError = (state: RootState) => selectOffersState(state).error;
 
 export const selectOffersByCurrentCity = createSelector(
   [selectOffers, selectCurrentCity],
@@ -29,4 +33,14 @@ export const selectSortedOffersByCurrentCity = createSelector(
         return [...offers];
     }
   }
+);
+
+export const selectOffersContentData = createSelector(
+  [selectCurrentCity, selectSortedOffersByCurrentCity, selectOffersStatus],
+  (currentCity, sortedOffersByCurrenCity, status) => ({
+    currentCity,
+    sortedOffersByCurrenCity,
+    status,
+    isLoading: status === RequestStatuses.Loading,
+  })
 );
