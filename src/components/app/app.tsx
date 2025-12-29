@@ -17,13 +17,13 @@ interface AppProps {
 const App: FC<AppProps> = ({offers}) => (
   <BrowserRouter basename={import.meta.env.BASE_URL}>
     <Routes>
-      <Route path="/" element={<MainPage offers={offers}/>}/>
+      <Route path="/" element={<MainPage/>}/>
       <Route path="/login" element={<Login/>}/>
       <Route
         path="/favorites"
         element={
           <PrivateRoute>
-            <Favorites offers={offers}/>
+            <Favorites/>
           </PrivateRoute>
         }
       />
