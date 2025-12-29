@@ -39,7 +39,7 @@ const OfferCard: FC<OfferCardProps> = ({offer, variant, isActive, handleOfferHov
       break;
     }
     case 'favorites': {
-      articleClassName = 'favorites__image-wrapper place-card__image-wrapper';
+      articleClassName = 'favorites__card place-card';
       imageWrapperClassName = 'favorites__image-wrapper place-card__image-wrapper';
       infoClassName = 'favorites__card-info place-card__info';
       imageWidth = '150';
