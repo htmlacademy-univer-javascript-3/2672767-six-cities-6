@@ -1,31 +1,43 @@
-import {FC, useCallback, useState} from 'react';
-import {useSelector} from 'react-redux';
+import {FC, useCallback, useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 
 import OffersList from '../components/offers-list/offers-list.tsx';
 import Header from '../components/header/header.tsx';
 import Map from '../components/map/map.tsx';
 import CitiesList from '../components/cities-list/cities-list.tsx';
+import Spinner from '../components/spinner/spinner.tsx';
+import SortingOptions from '../components/sorting-options/sorting-options.tsx';
 
 import {OfferShort} from '../types/offer.ts';
-import {
-  selectCurrentCity,
-  selectSortedOffersByCurrentCity
-} from '../store/selectors';
-import SortingOptions from '../components/sorting-options/sorting-options.tsx';
+import {selectOffersContentData,} from '../store/selectors';
+import {fetchOffersAction} from '../store/slices/offers-list-slice.ts';
+import {AppDispatch} from '../store';
+import {RequestStatuses} from '../const/api.ts';
 
 interface MainPageProps {
 }
 
 const MainPage: FC<MainPageProps> = () => {
-  const currentCity = useSelector(selectCurrentCity);
-  const offersByCurrentCity = useSelector(selectSortedOffersByCurrentCity);
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    currentCity,
+    sortedOffersByCurrenCity,
+    status: offersStatus,
+    isLoading,
+  } = useSelector(selectOffersContentData);
 
   const [activeOfferId, setActiveOfferId] = useState<OfferShort['id'] | null>(null);
+
+  useEffect(() => {
+
+    if (offersStatus === RequestStatuses.Idle) {
+      dispatch(fetchOffersAction());
+    }
+  }, [dispatch, offersStatus]);
 
   const handleOfferHover = useCallback((offerId: OfferShort['id'] | null) => {
     setActiveOfferId(offerId);
   }, []);
-
 
   return (
     <div className="page page--gray page--main">
@@ -42,22 +54,27 @@ const MainPage: FC<MainPageProps> = () => {
         </div>
         <div className="cities">
           <div className="cities__places-container container">
-            <section className="cities__places places">
-              <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">{offersByCurrentCity.length} places to stay in {currentCity}</b>
+            {isLoading && <Spinner/>}
+            {!isLoading && (
+              <>
+                <section className="cities__places places">
+                  <h2 className="visually-hidden">Places</h2>
+                  <b className="places__found">{sortedOffersByCurrenCity.length} places to stay in {currentCity}</b>
 
-              <SortingOptions/>
-              <OffersList
-                offers={offersByCurrentCity}
-                variant="cities"
-                activeOfferId={activeOfferId}
-                handleOfferHover={handleOfferHover}
-              />
+                  <SortingOptions/>
+                  <OffersList
+                    offers={sortedOffersByCurrenCity}
+                    variant="cities"
+                    activeOfferId={activeOfferId}
+                    handleOfferHover={handleOfferHover}
+                  />
 
-            </section>
-            <div className="cities__right-section">
-              <Map offers={offersByCurrentCity} activeOfferId={activeOfferId}/>
-            </div>
+                </section>
+                <div className="cities__right-section">
+                  <Map offers={sortedOffersByCurrenCity} activeOfferId={activeOfferId}/>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </main>
