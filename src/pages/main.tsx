@@ -4,6 +4,7 @@ import Header from '../components/header/header.tsx';
 import CitiesList from '../components/cities-list/cities-list.tsx';
 import Spinner from '../components/spinner/spinner.tsx';
 import CityOffersSection from '../components/city-offers-section/city-offers-section.tsx';
+import MainEmptyPage from './main-empty';
 
 import {selectOffersContentData,} from '../store/selectors';
 import {fetchOffersAction} from '../store/slices/offers-list-slice.ts';
@@ -28,6 +29,10 @@ const MainPage: FC<MainPageProps> = () => {
       dispatch(fetchOffersAction());
     }
   }, [dispatch, offersStatus]);
+
+  if (!isLoading && !sortedOffersByCurrenCity.length) {
+    return <MainEmptyPage currentCity={currentCity}/>;
+  }
 
   return (
     <div className="page page--gray page--main">

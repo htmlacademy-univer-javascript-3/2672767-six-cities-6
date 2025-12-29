@@ -1,7 +1,12 @@
 import {FC} from 'react';
 import Header from '../components/header/header.tsx';
+import CitiesList from '../components/cities-list/cities-list.tsx';
 
-const MainEmptyPage: FC = () => (
+interface MainEmptyPageProps {
+  currentCity: string;
+}
+
+const MainEmptyPage: FC<MainEmptyPageProps> = ({currentCity}) => (
   <div className="page page--gray page--main">
     <Header/>
 
@@ -9,38 +14,7 @@ const MainEmptyPage: FC = () => (
       <h1 className="visually-hidden">Cities</h1>
       <div className="tabs">
         <section className="locations container">
-          <ul className="locations__list tabs__list">
-            <li className="locations__item">
-              <a className="locations__item-link tabs__item" href="#">
-                <span>Paris</span>
-              </a>
-            </li>
-            <li className="locations__item">
-              <a className="locations__item-link tabs__item" href="#">
-                <span>Cologne</span>
-              </a>
-            </li>
-            <li className="locations__item">
-              <a className="locations__item-link tabs__item" href="#">
-                <span>Brussels</span>
-              </a>
-            </li>
-            <li className="locations__item">
-              <a className="locations__item-link tabs__item">
-                <span>Amsterdam</span>
-              </a>
-            </li>
-            <li className="locations__item">
-              <a className="locations__item-link tabs__item" href="#">
-                <span>Hamburg</span>
-              </a>
-            </li>
-            <li className="locations__item">
-              <a className="locations__item-link tabs__item tabs__item--active" href="#">
-                <span>Dusseldorf</span>
-              </a>
-            </li>
-          </ul>
+          <CitiesList currentCity={currentCity}/>
         </section>
       </div>
       <div className="cities">
@@ -48,7 +22,9 @@ const MainEmptyPage: FC = () => (
           <section className="cities__no-places">
             <div className="cities__status-wrapper tabs__content">
               <b className="cities__status">No places to stay available</b>
-              <p className="cities__status-description">We could not find any property available at the moment in Dusseldorf</p>
+              <p className="cities__status-description">We could not find any property available at the moment
+                in {currentCity}
+              </p>
             </div>
           </section>
           <div className="cities__right-section"></div>
