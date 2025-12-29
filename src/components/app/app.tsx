@@ -8,15 +8,10 @@ import Favorites from '../../pages/favorites';
 import OfferPage from '../../pages/offer';
 import NotFound from '../../pages/not-found';
 
-import {OfferShort} from '../../types/offer.ts';
 import {useAppDispatch} from '../../hooks';
 import {checkAuthAction} from '../../store/slices/user-slice.ts';
 
-interface AppProps {
-  offers: OfferShort[];
-}
-
-const App: FC<AppProps> = ({offers}) => {
+const App: FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -36,7 +31,8 @@ const App: FC<AppProps> = ({offers}) => {
             </PrivateRoute>
           }
         />
-        <Route path="/offer/:id" element={<OfferPage offers={offers}/>}/>
+        <Route path="/offer/:id" element={<OfferPage/>}/>
+        <Route path="/404" element={<NotFound/>}/>
 
         <Route path="*" element={<NotFound/>}/>
       </Routes>

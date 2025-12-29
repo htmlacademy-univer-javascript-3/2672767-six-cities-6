@@ -1,22 +1,99 @@
-import {FC} from 'react';
-import {useParams} from 'react-router-dom';
+import {FC, useEffect, useMemo} from 'react';
+import {Navigate, useNavigate, useParams} from 'react-router-dom';
 
 import Header from '../components/header/header.tsx';
 import ReviewsList from '../components/reviews-list/reviews-list.tsx';
 import ReviewForm from '../components/review-form/review-form.tsx';
 import OffersList from '../components/offers-list/offers-list.tsx';
 import Map from '../components/map/map.tsx';
+import Spinner from '../components/spinner/spinner.tsx';
 
-import {OfferShort} from '../types/offer.ts';
-import {reviews} from '../mocks/reviews.ts';
+import {useAppDispatch, useAppSelector} from '../hooks';
+import {
+  selectAuthorizationStatus,
+  selectCurrentOffer,
+  selectIsOfferNotFound,
+  selectNearbyOffers,
+  selectOfferStatus,
+  selectReviews
+} from '../store/selectors';
+import {
+  fetchNearbyOffersAction,
+  fetchOfferAction,
+  fetchReviewsAction,
+  resetOfferState
+} from '../store/slices/offer-slice.ts';
+import {RequestStatuses} from '../const/api.ts';
+import {AuthorizationStatus} from '../const/auth.ts';
 
+const MAX_OFFER_IMAGES = 6;
 
-interface OfferPageProps {
-  offers: OfferShort[];
-}
+const OfferPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const {id} = useParams<{ id: string }>();
 
-const OfferPage: FC<OfferPageProps> = ({offers}) => {
-  const {id} = useParams();
+  const offer = useAppSelector(selectCurrentOffer);
+  const offerStatus = useAppSelector(selectOfferStatus);
+  const nearbyOffers = useAppSelector(selectNearbyOffers);
+  const reviews = useAppSelector(selectReviews);
+  const authorizationStatus = useAppSelector(selectAuthorizationStatus);
+  const isOfferNotFound = useAppSelector(selectIsOfferNotFound);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    dispatch(fetchOfferAction(id));
+    dispatch(fetchNearbyOffersAction(id));
+    dispatch(fetchReviewsAction(id));
+
+    return () => {
+      dispatch(resetOfferState());
+    };
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (isOfferNotFound) {
+      navigate('/404', {replace: true});
+    }
+  }, [isOfferNotFound, navigate]);
+
+  const isAuthorized = authorizationStatus === AuthorizationStatus.Auth;
+
+  const ratingWidth = useMemo(() => {
+    if (!offer) {
+      return '0%';
+    }
+    return `${(100 * Math.round(offer.rating) / 5)}%`;
+  }, [offer]);
+
+  const offerImages = offer?.images.slice(0, MAX_OFFER_IMAGES) ?? [];
+  const mapOffers = offer ? [offer, ...nearbyOffers] : [];
+
+  if (!id) {
+    return <Navigate to="/404" replace/>;
+  }
+
+  if (isOfferNotFound) {
+    return <Navigate to="/404" replace/>;
+  }
+
+  if (offerStatus === RequestStatuses.Loading || offerStatus === RequestStatuses.Idle) {
+    return (
+      <div className="page">
+        <Header/>
+        <main className="page__main page__main--offer">
+          <Spinner/>
+        </main>
+      </div>
+    );
+  }
+
+  if (!offer) {
+    return null;
+  }
 
   return (
     <div className="page">
@@ -26,36 +103,28 @@ const OfferPage: FC<OfferPageProps> = ({offers}) => {
         <section className="offer">
           <div className="offer__gallery-container container">
             <div className="offer__gallery">
-              <div className="offer__image-wrapper">
-                <img className="offer__image" src="/img/room.jpg" alt="Photo studio"/>
-              </div>
-              <div className="offer__image-wrapper">
-                <img className="offer__image" src="/img/apartment-01.jpg" alt="Photo studio"/>
-              </div>
-              <div className="offer__image-wrapper">
-                <img className="offer__image" src="/img/apartment-02.jpg" alt="Photo studio"/>
-              </div>
-              <div className="offer__image-wrapper">
-                <img className="offer__image" src="/img/apartment-03.jpg" alt="Photo studio"/>
-              </div>
-              <div className="offer__image-wrapper">
-                <img className="offer__image" src="/img/studio-01.jpg" alt="Photo studio"/>
-              </div>
-              <div className="offer__image-wrapper">
-                <img className="offer__image" src="/img/apartment-01.jpg" alt="Photo studio"/>
-              </div>
+              {offerImages.map((image) => (
+                <div className="offer__image-wrapper" key={image}>
+                  <img className="offer__image" src={image} alt={offer.title}/>
+                </div>
+              ))}
             </div>
           </div>
           <div className="offer__container container">
             <div className="offer__wrapper">
-              <div className="offer__mark">
-                <span>Premium</span>
-              </div>
+              {offer.isPremium && (
+                <div className="offer__mark">
+                  <span>Premium</span>
+                </div>
+              )}
               <div className="offer__name-wrapper">
                 <h1 className="offer__name">
-                  Offer name ${id}
+                  {offer.title}
                 </h1>
-                <button className="offer__bookmark-button button" type="button">
+                <button
+                  className={`offer__bookmark-button button ${offer.isFavorite ? 'offer__bookmark-button--active' : ''}`}
+                  type="button"
+                >
                   <svg className="offer__bookmark-icon" width="31" height="33">
                     <use xlinkHref="#icon-bookmark"></use>
                   </svg>
@@ -64,99 +133,72 @@ const OfferPage: FC<OfferPageProps> = ({offers}) => {
               </div>
               <div className="offer__rating rating">
                 <div className="offer__stars rating__stars">
-                  <span style={{width: '80%'}}></span>
+                  <span style={{width: ratingWidth}}></span>
                   <span className="visually-hidden">Rating</span>
                 </div>
-                <span className="offer__rating-value rating__value">4.8</span>
+                <span className="offer__rating-value rating__value">{offer.rating}</span>
               </div>
               <ul className="offer__features">
                 <li className="offer__feature offer__feature--entire">
-                  Apartment
+                  {offer.type}
                 </li>
                 <li className="offer__feature offer__feature--bedrooms">
-                  3 Bedrooms
+                  {offer.bedrooms} Bedrooms
                 </li>
                 <li className="offer__feature offer__feature--adults">
-                  Max 4 adults
+                  Max {offer.maxAdults} adults
                 </li>
               </ul>
               <div className="offer__price">
-                <b className="offer__price-value">&euro;120</b>
+                <b className="offer__price-value">&euro;{offer.price}</b>
                 <span className="offer__price-text">&nbsp;night</span>
               </div>
               <div className="offer__inside">
                 <h2 className="offer__inside-title">What&apos;s inside</h2>
                 <ul className="offer__inside-list">
-                  <li className="offer__inside-item">
-                    Wi-Fi
-                  </li>
-                  <li className="offer__inside-item">
-                    Washing machine
-                  </li>
-                  <li className="offer__inside-item">
-                    Towels
-                  </li>
-                  <li className="offer__inside-item">
-                    Heating
-                  </li>
-                  <li className="offer__inside-item">
-                    Coffee machine
-                  </li>
-                  <li className="offer__inside-item">
-                    Baby seat
-                  </li>
-                  <li className="offer__inside-item">
-                    Kitchen
-                  </li>
-                  <li className="offer__inside-item">
-                    Dishwasher
-                  </li>
-                  <li className="offer__inside-item">
-                    Cabel TV
-                  </li>
-                  <li className="offer__inside-item">
-                    Fridge
-                  </li>
+                  {offer.goods.map((item) => (
+                    <li className="offer__inside-item" key={item}>
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className="offer__host">
                 <h2 className="offer__host-title">Meet the host</h2>
                 <div className="offer__host-user user">
-                  <div className="offer__avatar-wrapper offer__avatar-wrapper--pro user__avatar-wrapper">
-                    <img className="offer__avatar user__avatar" src="/img/avatar-angelina.jpg" width="74" height="74"
+                  <div
+                    className={`offer__avatar-wrapper ${offer.host.isPro ? 'offer__avatar-wrapper--pro' : ''} user__avatar-wrapper`}
+                  >
+                    <img className="offer__avatar user__avatar" src={offer.host.avatarUrl} width="74" height="74"
                       alt="Host avatar"
                     />
                   </div>
                   <span className="offer__user-name">
-                      Angelina
+                    {offer.host.name}
                   </span>
-                  <span className="offer__user-status">
+                  {offer.host.isPro && (
+                    <span className="offer__user-status">
                       Pro
-                  </span>
+                    </span>
+                  )}
                 </div>
                 <div className="offer__description">
                   <p className="offer__text">
-                    A quiet cozy and picturesque that hides behind a a river by the unique lightness of Amsterdam. The
-                    building is green and from 18th century.
-                  </p>
-                  <p className="offer__text">
-                    An independent House, strategically located between Rembrand Square and National Opera, but where
-                    the
-                    bustle of the city comes to rest in this alley flowery and colorful.
+                    {offer.description}
                   </p>
                 </div>
               </div>
               <section className="offer__reviews reviews">
 
                 <ReviewsList reviews={reviews}/>
-                <ReviewForm/>
+                {isAuthorized && <ReviewForm offerId={offer.id}/>}
 
               </section>
             </div>
           </div>
           <section className="offer__map">
 
-            <Map offers={offers} activeOfferId={id}/>
+            <Map offers={mapOffers} activeOfferId={offer.id}/>
 
           </section>
         </section>
@@ -164,7 +206,7 @@ const OfferPage: FC<OfferPageProps> = ({offers}) => {
           <section className="near-places places">
             <h2 className="near-places__title">Other places in the neighbourhood</h2>
 
-            <OffersList offers={offers} variant={'near'}/>
+            <OffersList offers={nearbyOffers} variant={'near'}/>
 
           </section>
         </div>

@@ -1,4 +1,8 @@
-import {ChangeEvent, FC, FormEvent, Fragment, useMemo, useState} from 'react';
+import {ChangeEvent, FC, FormEvent, Fragment, useEffect, useMemo, useState} from 'react';
+import {useAppDispatch, useAppSelector} from '../../hooks';
+import {postReviewAction} from '../../store/slices/offer-slice.ts';
+import {selectReviewSendingStatus} from '../../store/selectors';
+import {RequestStatuses} from '../../const/api.ts';
 
 const ratingOptions = [
   {value: '5', title: 'perfect'},
@@ -11,9 +15,18 @@ const ratingOptions = [
 const MIN_REVIEW_LENGTH = 50;
 const MAX_REVIEW_LENGTH = 300;
 
-const ReviewForm: FC = () => {
+interface ReviewFormProps {
+  offerId: string;
+}
+
+const ReviewForm: FC<ReviewFormProps> = ({offerId}) => {
+  const dispatch = useAppDispatch();
+  const reviewSendingStatus = useAppSelector(selectReviewSendingStatus);
   const [rating, setRating] = useState<string>('');
   const [review, setReview] = useState<string>('');
+
+  const isSubmitting = reviewSendingStatus === RequestStatuses.Loading;
+
 
   // Определение заблокирована ли форма или нет
   const isSubmitDisabled = useMemo(() => {
@@ -32,8 +45,27 @@ const ReviewForm: FC = () => {
     setReview(value.slice(0, MAX_REVIEW_LENGTH));
   };
 
+  useEffect(() => {
+    if (reviewSendingStatus === RequestStatuses.Succeeded) {
+      setRating('');
+      setReview('');
+    }
+  }, [reviewSendingStatus]);
+
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
+
+    if (isSubmitDisabled || isSubmitting) {
+      return;
+    }
+
+    dispatch(postReviewAction({
+      offerId,
+      reviewData: {
+        comment: review.trim(),
+        rating: Number(rating),
+      }
+    }));
   };
 
   return (
@@ -50,6 +82,7 @@ const ReviewForm: FC = () => {
               type="radio"
               checked={rating === value}
               onChange={handleRatingChange}
+              disabled={isSubmitting}
             />
             <label htmlFor={`${value}-stars`} className="reviews__rating-label form__rating-label" title={title}>
               <svg className="form__star-image" width="37" height="33">
@@ -66,6 +99,7 @@ const ReviewForm: FC = () => {
         placeholder="Tell how was your stay, what you like and what can be improved"
         value={review}
         onChange={handleReviewChange}
+        disabled={isSubmitting}
       >
       </textarea>
       <div className="reviews__button-wrapper">
@@ -73,7 +107,9 @@ const ReviewForm: FC = () => {
           To submit review please make sure to set <span className="reviews__star">rating</span> and describe
           your stay with at least <b className="reviews__text-amount">50 characters</b>.
         </p>
-        <button className="reviews__submit form__submit button" type="submit" disabled={isSubmitDisabled}>
+        <button className="reviews__submit form__submit button" type="submit"
+          disabled={isSubmitDisabled || isSubmitting}
+        >
           Submit
         </button>
       </div>

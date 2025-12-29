@@ -4,12 +4,12 @@ import 'leaflet/dist/leaflet.css';
 
 
 import useMap from '../hooks/use-map.ts';
-import {OfferShort} from '../../types/offer.ts';
+import {OfferFull, OfferShort} from '../../types/offer.ts';
 import {MapLocation} from '../../types/map-location.ts';
 import {CITY_DATA, CITY_NAMES} from '../../const/city.ts';
 
 type MapProps = {
-  offers: OfferShort[];
+  offers: Array<OfferShort | OfferFull>;
   activeOfferId?: OfferShort['id'] | null;
 
 };
@@ -27,7 +27,6 @@ const currentCustomIcon = new Icon({
 });
 
 const Map: FC<MapProps> = ({offers, activeOfferId}) => {
-
   const mapRef = useRef(null);
   const mapCenter: MapLocation = useMemo(() => offers[0]?.city?.location || CITY_DATA[CITY_NAMES[0]].location, [offers]);
 
