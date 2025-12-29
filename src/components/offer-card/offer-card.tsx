@@ -1,7 +1,11 @@
 import {FC, memo, useCallback} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 import {OfferShort} from '../../types/offer.ts';
+import {useAppDispatch, useAppSelector} from '../../hooks';
+import {AuthorizationStatus} from '../../const/auth.ts';
+import {selectAuthorizationStatus} from '../../store/selectors';
+import {changeFavoriteStatusAction} from '../../store/slices/favorite-slice.ts';
 
 type OfferCardVariant = 'cities' | 'favorites' | 'near';
 
@@ -13,6 +17,9 @@ interface OfferCardProps {
 }
 
 const OfferCardComponent: FC<OfferCardProps> = ({offer, variant, isActive, handleOfferHover}) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const authorizationStatus = useAppSelector(selectAuthorizationStatus);
   const {id, title, type, price, isFavorite, isPremium, rating, previewImage} = offer;
 
   // Bookmark block
@@ -66,6 +73,15 @@ const OfferCardComponent: FC<OfferCardProps> = ({offer, variant, isActive, handl
     handleOfferHover?.(null);
   }, [handleOfferHover]);
 
+  const handleBookmarkClick = useCallback(() => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate('/login');
+      return;
+    }
+
+    dispatch(changeFavoriteStatusAction({offerId: id, status: !isFavorite}));
+  }, [authorizationStatus, dispatch, id, isFavorite, navigate]);
+
   return (
     <article
       className={`${articleClassName}${activeClassName}`}
@@ -98,6 +114,7 @@ const OfferCardComponent: FC<OfferCardProps> = ({offer, variant, isActive, handl
           <button
             className={`place-card__bookmark-button ${bookmarkStatusClassName} button`}
             type="button"
+            onClick={handleBookmarkClick}
           >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use xlinkHref="#icon-bookmark"></use>

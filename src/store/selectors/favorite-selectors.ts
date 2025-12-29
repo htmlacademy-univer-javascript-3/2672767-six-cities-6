@@ -8,6 +8,8 @@ export const selectFavoriteOffers = createSelector(
   [selectFavoritesState],
   (favoritesState) => favoritesState.items
 );
+export const selectFavoriteStatus = (state: RootState) =>
+  selectFavoritesState(state).status;
 
 
 export const selectFavoriteOffersByCity = createSelector(

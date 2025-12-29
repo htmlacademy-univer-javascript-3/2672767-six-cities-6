@@ -4,6 +4,7 @@ import {OfferShort} from '../../types/offer.ts';
 import {SortingType} from '../../types/sorting.ts';
 import {DEFAULT_SORTING_TYPE} from '../../const/sorting.ts';
 import {RequestStatuses} from '../../const/api.ts';
+import {changeFavoriteStatusAction} from './favorite-slice.ts';
 
 export interface OffersListState {
   items: OfferShort[];
@@ -52,6 +53,15 @@ const offersListSlice = createSlice({
       .addCase(fetchOffersAction.rejected, (state, action) => {
         state.status = RequestStatuses.Failed;
         state.error = action.error.message ?? 'Unable to load offers';
+      })
+
+      .addCase(changeFavoriteStatusAction.fulfilled, (state, action) => {
+        const updatedOffer = action.payload;
+        const offerIndex = state.items.findIndex((offer) => offer.id === updatedOffer.id);
+
+        if (offerIndex !== -1) {
+          state.items[offerIndex] = updatedOffer;
+        }
       });
   }
 });

@@ -4,6 +4,7 @@ import {StatusCodes} from 'http-status-codes';
 import {OfferFull, OfferShort} from '../../types/offer.ts';
 import {Review, ReviewFormData} from '../../types/review.ts';
 import {RequestStatuses} from '../../const/api.ts';
+import {changeFavoriteStatusAction} from './favorite-slice.ts';
 
 export interface OfferState {
   offer: OfferFull | null;
@@ -141,6 +142,20 @@ const offerSlice = createSlice({
       })
       .addCase(postReviewAction.rejected, (state) => {
         state.reviewSendingStatus = RequestStatuses.Failed;
+      })
+
+      .addCase(changeFavoriteStatusAction.fulfilled, (state, action) => {
+        const updatedOffer = action.payload;
+
+        if (state.offer?.id === updatedOffer.id) {
+          state.offer = {...state.offer, isFavorite: updatedOffer.isFavorite};
+        }
+
+        const nearbyIndex = state.nearbyOffers.findIndex((offer) => offer.id === updatedOffer.id);
+
+        if (nearbyIndex !== -1) {
+          state.nearbyOffers[nearbyIndex] = updatedOffer;
+        }
       });
   }
 });

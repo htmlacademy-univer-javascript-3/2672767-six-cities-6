@@ -1,16 +1,37 @@
-import {FC} from 'react';
+import {FC, useEffect} from 'react';
 
 import OffersList from '../components/offers-list/offers-list.tsx';
 import Header from '../components/header/header.tsx';
+import FavoritesEmptyPage from './favorites-empty.tsx';
 import {CITY_NAMES} from '../const/city.ts';
-import {selectFavoriteOffersByCity} from '../store/selectors';
-import {useAppSelector} from '../hooks';
+import {RequestStatuses} from '../const/api.ts';
+import {selectFavoriteOffers, selectFavoriteOffersByCity, selectFavoriteStatus} from '../store/selectors';
+import {useAppDispatch, useAppSelector} from '../hooks';
+import Spinner from '../components/spinner/spinner.tsx';
+import {fetchFavoriteOffersAction} from '../store/slices/favorite-slice.ts';
 
 interface FavoritesPageProps {
 }
 
 const FavoritesPage: FC<FavoritesPageProps> = () => {
+  const dispatch = useAppDispatch();
   const favoriteOffersByCity = useAppSelector(selectFavoriteOffersByCity);
+  const allFavoriteOffers = useAppSelector(selectFavoriteOffers);
+  const favoriteStatus = useAppSelector(selectFavoriteStatus);
+
+  useEffect(() => {
+    if (favoriteStatus === RequestStatuses.Idle) {
+      dispatch(fetchFavoriteOffersAction());
+    }
+  }, [dispatch, favoriteStatus]);
+
+  if (favoriteStatus === RequestStatuses.Loading) {
+    return <Spinner/>;
+  }
+
+  if (favoriteStatus === RequestStatuses.Succeeded && allFavoriteOffers.length === 0) {
+    return <FavoritesEmptyPage/>;
+  }
 
   return (
     <div className="page">

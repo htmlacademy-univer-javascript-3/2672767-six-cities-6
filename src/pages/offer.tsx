@@ -25,6 +25,7 @@ import {
 } from '../store/slices/offer-slice.ts';
 import {RequestStatuses} from '../const/api.ts';
 import {AuthorizationStatus} from '../const/auth.ts';
+import {changeFavoriteStatusAction} from '../store/slices/favorite-slice.ts';
 
 const MAX_OFFER_IMAGES = 6;
 
@@ -95,6 +96,15 @@ const OfferPage: FC = () => {
     return null;
   }
 
+  const handleBookmarkClick = () => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate('/login');
+      return;
+    }
+
+    dispatch(changeFavoriteStatusAction({offerId: offer.id, status: !offer.isFavorite}));
+  };
+
   return (
     <div className="page">
       <Header/>
@@ -124,6 +134,7 @@ const OfferPage: FC = () => {
                 <button
                   className={`offer__bookmark-button button ${offer.isFavorite ? 'offer__bookmark-button--active' : ''}`}
                   type="button"
+                  onClick={handleBookmarkClick}
                 >
                   <svg className="offer__bookmark-icon" width="31" height="33">
                     <use xlinkHref="#icon-bookmark"></use>
