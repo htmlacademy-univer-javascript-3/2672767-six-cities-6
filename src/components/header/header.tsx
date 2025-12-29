@@ -1,10 +1,21 @@
-import {FC} from 'react';
+import {FC, MouseEventHandler} from 'react';
 import {Link} from 'react-router-dom';
-
+import {useAppDispatch, useAppSelector} from '../../hooks';
+import {AuthorizationStatus} from '../../const/auth.ts';
+import {logoutAction} from '../../store/slices/user-slice.ts';
+import {selectAuthorizationStatus, selectFavoriteOffers, selectUserInfo} from '../../store/selectors';
 
 const Header: FC = () => {
-  const isAuth = true;
+  const dispatch = useAppDispatch();
+  const authorizationStatus = useAppSelector(selectAuthorizationStatus);
+  const userInfo = useAppSelector(selectUserInfo);
+  const favoriteOffersCount = useAppSelector(selectFavoriteOffers).length;
+  const isAuthorized = authorizationStatus === AuthorizationStatus.Auth;
 
+  const handleSignOut: MouseEventHandler<HTMLAnchorElement> = (evt) => {
+    evt.preventDefault();
+    dispatch(logoutAction());
+  };
 
   return (
     <header className="header">
@@ -17,18 +28,18 @@ const Header: FC = () => {
           </div>
           <nav className="header__nav">
             <ul className="header__nav-list">
-              {isAuth ? (
+              {isAuthorized ? (
                 <>
                   <li className="header__nav-item user">
                     <Link className="header__nav-link header__nav-link--profile" to="/favorites">
                       <div className="header__avatar-wrapper user__avatar-wrapper">
                       </div>
-                      <span className="header__user-name user__name">Oliver.conner@gmail.com</span>
-                      <span className="header__favorite-count">3</span>
+                      <span className="header__user-name user__name">{userInfo?.email}</span>
+                      <span className="header__favorite-count">{favoriteOffersCount}</span>
                     </Link>
                   </li>
                   <li className="header__nav-item">
-                    <Link className="header__nav-link" to="/login">
+                    <Link className="header__nav-link" to="/" onClick={handleSignOut}>
                       <span className="header__signout">Sign out</span>
                     </Link>
                   </li>

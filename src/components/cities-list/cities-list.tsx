@@ -1,8 +1,7 @@
 import {FC, MouseEvent} from 'react';
-import {useDispatch} from 'react-redux';
 
 import {changeCity} from '../../store/slices/city-slice.ts';
-import {AppDispatch} from '../../store';
+import {useAppDispatch} from '../../hooks';
 
 import {CITY_NAMES} from '../../const/city.ts';
 
@@ -11,7 +10,7 @@ interface CitiesListProps {
 }
 
 const CitiesList: FC<CitiesListProps> = ({currentCity}) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   const onCitySelect = (evt: MouseEvent<HTMLAnchorElement>, cityName: string) => {
     evt.preventDefault();

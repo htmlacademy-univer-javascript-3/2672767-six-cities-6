@@ -3,6 +3,8 @@ import {configureStore} from '@reduxjs/toolkit';
 import {offersListReducer} from './slices/offers-list-slice.ts';
 import {cityReducer} from './slices/city-slice.ts';
 import {favoriteReducer} from './slices/favorite-slice.ts';
+import {userReducer} from './slices/user-slice.ts';
+
 import {apiClient} from '../api/api.ts';
 
 export const store = configureStore({
@@ -10,6 +12,7 @@ export const store = configureStore({
     city: cityReducer,
     offersList: offersListReducer,
     favorite: favoriteReducer,
+    user: userReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
