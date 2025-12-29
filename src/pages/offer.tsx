@@ -71,7 +71,11 @@ const OfferPage: FC = () => {
   }, [offer]);
 
   const offerImages = offer?.images.slice(0, MAX_OFFER_IMAGES) ?? [];
-  const mapOffers = offer ? [offer, ...nearbyOffers] : [];
+  const nearbyOffersLimited = useMemo(
+    () => nearbyOffers.slice(0, 3),
+    [nearbyOffers]
+  );
+  const mapOffers = offer ? [offer, ...nearbyOffersLimited] : [];
 
   if (!id) {
     return <Navigate to="/404" replace/>;
@@ -151,13 +155,13 @@ const OfferPage: FC = () => {
               </div>
               <ul className="offer__features">
                 <li className="offer__feature offer__feature--entire">
-                  {offer.type}
+                  {offer.type.charAt(0).toUpperCase() + offer.type.slice(1)}
                 </li>
                 <li className="offer__feature offer__feature--bedrooms">
-                  {offer.bedrooms} Bedrooms
+                  {offer.bedrooms} Bedroom{offer.bedrooms === 1 ? '' : 's'}
                 </li>
                 <li className="offer__feature offer__feature--adults">
-                  Max {offer.maxAdults} adults
+                  Max {offer.maxAdults} adult{offer.maxAdults === 1 ? '' : 's'}
                 </li>
               </ul>
               <div className="offer__price">
@@ -217,7 +221,7 @@ const OfferPage: FC = () => {
           <section className="near-places places">
             <h2 className="near-places__title">Other places in the neighbourhood</h2>
 
-            <OffersList offers={nearbyOffers} variant={'near'}/>
+            <OffersList offers={nearbyOffersLimited} variant={'near'}/>
 
           </section>
         </div>
