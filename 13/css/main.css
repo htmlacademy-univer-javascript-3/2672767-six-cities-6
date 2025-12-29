@@ -1736,6 +1736,13 @@ img {
   background-color: #c7c7c7
 }
 
+.form__error {
+  margin: -12px 0 18px;
+  font-size: 14px;
+  line-height: 1.25;
+  color: #d9534f
+}
+
 .near-places {
   margin: 0 16px 0 12px;
   padding-bottom: 27px;
