@@ -10,3 +10,8 @@ export interface UserAuth {
 }
 
 export type UserFull = UserCommon & UserAuth;
+
+export interface LoginData {
+  email: string;
+  password: string;
+}

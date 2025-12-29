@@ -1,17 +1,16 @@
 import {FC, MouseEvent, useMemo, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 
 import {SortingType} from '../../types/sorting.ts';
 import {SORTING_OPTIONS} from '../../const/sorting.ts';
 
-import {AppDispatch} from '../../store';
 import {setSortingType} from '../../store/slices/offers-list-slice.ts';
 import {selectSortingType} from '../../store/selectors';
+import {useAppDispatch, useAppSelector} from '../../hooks';
 
 
 const SortingOptions: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const currentSort = useSelector(selectSortingType);
+  const dispatch = useAppDispatch();
+  const currentSort = useAppSelector(selectSortingType);
 
   const [isOpened, setIsOpened] = useState(false);
 

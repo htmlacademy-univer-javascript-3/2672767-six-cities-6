@@ -1,5 +1,4 @@
 import {FC, useCallback, useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 
 import OffersList from '../components/offers-list/offers-list.tsx';
 import Header from '../components/header/header.tsx';
@@ -11,20 +10,20 @@ import SortingOptions from '../components/sorting-options/sorting-options.tsx';
 import {OfferShort} from '../types/offer.ts';
 import {selectOffersContentData,} from '../store/selectors';
 import {fetchOffersAction} from '../store/slices/offers-list-slice.ts';
-import {AppDispatch} from '../store';
 import {RequestStatuses} from '../const/api.ts';
+import {useAppDispatch, useAppSelector} from '../hooks';
 
 interface MainPageProps {
 }
 
 const MainPage: FC<MainPageProps> = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const {
     currentCity,
     sortedOffersByCurrenCity,
     status: offersStatus,
     isLoading,
-  } = useSelector(selectOffersContentData);
+  } = useAppSelector(selectOffersContentData);
 
   const [activeOfferId, setActiveOfferId] = useState<OfferShort['id'] | null>(null);
 

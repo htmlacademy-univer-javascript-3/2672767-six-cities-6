@@ -1,16 +1,16 @@
 import {FC} from 'react';
-import {useSelector} from 'react-redux';
 
 import OffersList from '../components/offers-list/offers-list.tsx';
 import Header from '../components/header/header.tsx';
 import {CITY_NAMES} from '../const/city.ts';
 import {selectFavoriteOffersByCity} from '../store/selectors';
+import {useAppSelector} from '../hooks';
 
 interface FavoritesPageProps {
 }
 
 const FavoritesPage: FC<FavoritesPageProps> = () => {
-  const favoriteOffersByCity = useSelector(selectFavoriteOffersByCity);
+  const favoriteOffersByCity = useAppSelector(selectFavoriteOffersByCity);
 
   return (
     <div className="page">
