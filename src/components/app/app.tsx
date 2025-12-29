@@ -1,4 +1,4 @@
-import {FC} from 'react';
+import {FC, useEffect} from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import PrivateRoute from '../private-route/private-route.tsx';
 
@@ -8,30 +8,36 @@ import Favorites from '../../pages/favorites';
 import OfferPage from '../../pages/offer';
 import NotFound from '../../pages/not-found';
 
-import type Offer from '../../types/offer';
+import {useAppDispatch} from '../../hooks';
+import {checkAuthAction} from '../../store/slices/user-slice.ts';
 
-interface AppProps {
-  offers: Offer[];
-}
+const App: FC = () => {
+  const dispatch = useAppDispatch();
 
-const App: FC<AppProps> = ({offers}) => (
-  <BrowserRouter basename={import.meta.env.BASE_URL}>
-    <Routes>
-      <Route path="/" element={<MainPage offers={offers}/>}/>
-      <Route path="/login" element={<Login/>}/>
-      <Route
-        path="/favorites"
-        element={
-          <PrivateRoute>
-            <Favorites/>
-          </PrivateRoute>
-        }
-      />
-      <Route path="/offer/:id" element={<OfferPage/>}/>
+  useEffect(() => {
+    dispatch(checkAuthAction());
+  }, [dispatch]);
 
-      <Route path="*" element={<NotFound/>}/>
-    </Routes>
-  </BrowserRouter>
-);
+  return (
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <Routes>
+        <Route path="/" element={<MainPage/>}/>
+        <Route path="/login" element={<Login/>}/>
+        <Route
+          path="/favorites"
+          element={
+            <PrivateRoute>
+              <Favorites/>
+            </PrivateRoute>
+          }
+        />
+        <Route path="/offer/:id" element={<OfferPage/>}/>
+        <Route path="/404" element={<NotFound/>}/>
+
+        <Route path="*" element={<NotFound/>}/>
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
 export default App;
