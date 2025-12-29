@@ -2,14 +2,18 @@ import {ChangeEvent, FC, FormEvent, useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useAppDispatch, useAppSelector} from '../hooks';
 import {loginAction} from '../store/slices/user-slice.ts';
-import {selectAuthorizationStatus} from '../store/selectors';
+import {selectAuthorizationStatus, selectLoginError, selectLoginStatus} from '../store/selectors';
 import {AuthorizationStatus} from '../const/auth.ts';
+import {RequestStatuses} from '../const/api.ts';
 import {LoginData} from '../types/user.ts';
 
 const LoginPage: FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const authorizationStatus = useAppSelector(selectAuthorizationStatus);
+  const loginStatus = useAppSelector(selectLoginStatus);
+  const loginError = useAppSelector(selectLoginError);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const [credentials, setCredentials] = useState<LoginData>({
     email: '',
@@ -19,15 +23,21 @@ const LoginPage: FC = () => {
   const handleInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const {name, value} = evt.target;
     setCredentials((prev) => ({...prev, [name]: value}));
+    setValidationError(null);
   };
 
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    const isPasswordValid = /^(?=.*[a-zA-Z])(?=.*\d)[^\s].*$/.test(credentials.password);
+    const password = credentials.password.trim();
+    const email = credentials.email.trim();
+    const isPasswordValid = /^(?=.*[a-zA-Z])(?=.*\d).+$/.test(password);
 
-    if (isPasswordValid) {
-      dispatch(loginAction(credentials));
+    if (!isPasswordValid) {
+      setValidationError('Password must contain at least one letter and one number.');
+      return;
     }
+
+    dispatch(loginAction({email, password}));
   };
 
   useEffect(() => {
@@ -79,7 +89,16 @@ const LoginPage: FC = () => {
                   required
                 />
               </div>
-              <button className="login__submit form__submit button" type="submit">Sign in</button>
+              {(validationError || loginError) && (
+                <p className="form__error">{validationError ?? loginError}</p>
+              )}
+              <button
+                className="login__submit form__submit button"
+                type="submit"
+                disabled={loginStatus === RequestStatuses.Loading}
+              >
+                {loginStatus === RequestStatuses.Loading ? 'Signing in…' : 'Sign in'}
+              </button>
             </form>
           </section>
           <section className="locations locations--login locations--current">
