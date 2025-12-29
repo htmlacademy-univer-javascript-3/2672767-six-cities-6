@@ -1,4 +1,4 @@
-import {FC} from 'react';
+import {FC, useMemo} from 'react';
 
 import {Review as ReviewType} from '../../types/review.ts';
 import Review from '../review/review.tsx';
@@ -10,9 +10,12 @@ interface ReviewListProps {
 const REVIEWS_LIMIT = 10;
 
 const ReviewsList: FC<ReviewListProps> = ({reviews}) => {
-  const preparedReviews = [...reviews]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, REVIEWS_LIMIT);
+  const preparedReviews = useMemo(
+    () => [...reviews]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, REVIEWS_LIMIT),
+    [reviews]
+  );
 
   if (preparedReviews.length === 0) {
     return null;

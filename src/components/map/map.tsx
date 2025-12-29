@@ -1,15 +1,15 @@
-import {useRef, useEffect, FC, useMemo} from 'react';
-import {Icon, Marker, layerGroup} from 'leaflet';
+import {FC, useEffect, useMemo, useRef} from 'react';
+import {Icon, layerGroup, LayerGroup, Marker} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 
 import useMap from '../hooks/use-map.ts';
-import {OfferShort} from '../../types/offer.ts';
+import {OfferFull, OfferShort} from '../../types/offer.ts';
 import {MapLocation} from '../../types/map-location.ts';
 import {CITY_DATA, CITY_NAMES} from '../../const/city.ts';
 
 type MapProps = {
-  offers: OfferShort[];
+  offers: Array<OfferShort | OfferFull>;
   activeOfferId?: OfferShort['id'] | null;
 
 };
@@ -27,35 +27,55 @@ const currentCustomIcon = new Icon({
 });
 
 const Map: FC<MapProps> = ({offers, activeOfferId}) => {
-
   const mapRef = useRef(null);
   const mapCenter: MapLocation = useMemo(() => offers[0]?.city?.location || CITY_DATA[CITY_NAMES[0]].location, [offers]);
 
   const map = useMap(mapRef, mapCenter);
+  const markerLayerRef = useRef<LayerGroup | null>(null);
+  const markersRef = useRef<Record<OfferShort['id'], Marker>>({});
 
   useEffect(() => {
-    if (map) {
-      const markerLayer = layerGroup().addTo(map);
-      offers.forEach((offer) => {
-        const marker = new Marker({
-          lat: offer.location.latitude,
-          lng: offer.location.longitude
-        });
-
-        marker
-          .setIcon(
-            activeOfferId === offer.id
-              ? currentCustomIcon
-              : defaultCustomIcon
-          )
-          .addTo(markerLayer);
-      });
-
-      return () => {
-        map.removeLayer(markerLayer);
-      };
+    if (!map) {
+      return;
     }
-  }, [map, offers, activeOfferId]);
+
+    const markerLayer = layerGroup().addTo(map);
+    markerLayerRef.current = markerLayer;
+
+    return () => {
+      markerLayerRef.current = null;
+      markerLayer.removeFrom(map);
+      markersRef.current = {};
+    };
+  }, [map]);
+
+  useEffect(() => {
+    if (!map || !markerLayerRef.current) {
+      return;
+    }
+
+    const markerLayer = markerLayerRef.current;
+    markerLayer.clearLayers();
+    markersRef.current = {};
+
+    offers.forEach((offer) => {
+      markersRef.current[offer.id] = new Marker({
+        lat: offer.location.latitude,
+        lng: offer.location.longitude
+      }).setIcon(defaultCustomIcon)
+        .addTo(markerLayer);
+    });
+  }, [map, offers]);
+
+  useEffect(() => {
+    const markers = markersRef.current;
+
+    Object.values(markers).forEach((marker) => marker.setIcon(defaultCustomIcon));
+
+    if (activeOfferId && markers[activeOfferId]) {
+      markers[activeOfferId].setIcon(currentCustomIcon);
+    }
+  }, [activeOfferId]);
 
   return <div id="cities__map" className="cities__map" ref={mapRef}/>;
 };

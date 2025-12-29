@@ -1,4 +1,4 @@
-import {FC} from 'react';
+import {FC, memo} from 'react';
 import OfferCard from '../offer-card/offer-card.tsx';
 import {OfferShort} from '../../types/offer.ts';
 
@@ -11,7 +11,7 @@ interface OffersListProps {
   handleOfferHover?: (offerId: OfferShort['id'] | null) => void;
 }
 
-const OffersList: FC<OffersListProps> = ({offers, variant, activeOfferId, handleOfferHover}) => {
+const OffersListComponent: FC<OffersListProps> = ({offers, variant, activeOfferId, handleOfferHover}) => {
 
   let listClassName;
   switch (variant) {
@@ -45,4 +45,5 @@ const OffersList: FC<OffersListProps> = ({offers, variant, activeOfferId, handle
   );
 };
 
+const OffersList = memo(OffersListComponent);
 export default OffersList;

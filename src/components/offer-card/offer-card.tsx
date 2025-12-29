@@ -1,4 +1,4 @@
-import {FC, useCallback} from 'react';
+import {FC, memo, useCallback} from 'react';
 import {Link} from 'react-router-dom';
 
 import {OfferShort} from '../../types/offer.ts';
@@ -12,7 +12,7 @@ interface OfferCardProps {
   handleOfferHover?: (offerId: OfferShort['id'] | null) => void;
 }
 
-const OfferCard: FC<OfferCardProps> = ({offer, variant, isActive, handleOfferHover}) => {
+const OfferCardComponent: FC<OfferCardProps> = ({offer, variant, isActive, handleOfferHover}) => {
   const {id, title, type, price, isFavorite, isPremium, rating, previewImage} = offer;
 
   // Bookmark block
@@ -119,4 +119,5 @@ const OfferCard: FC<OfferCardProps> = ({offer, variant, isActive, handleOfferHov
     </article>);
 };
 
+const OfferCard = memo(OfferCardComponent);
 export default OfferCard;

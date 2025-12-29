@@ -34,8 +34,11 @@ export const loginAction = createAsyncThunk<UserFull, LoginData, { extra: AxiosI
 export const logoutAction = createAsyncThunk<void, undefined, { extra: AxiosInstance }>(
   'user/logout',
   async (_arg, {extra: api}) => {
-    await api.delete('/logout');
-    dropToken();
+    try {
+      await api.delete('/logout');
+    } finally {
+      dropToken();
+    }
   }
 );
 
@@ -68,7 +71,6 @@ const userSlice = createSlice({
       .addCase(logoutAction.rejected, (state) => {
         state.authorizationStatus = AuthorizationStatus.NoAuth;
         state.userInfo = null;
-        dropToken();
       });
   },
 });
