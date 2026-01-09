@@ -5,7 +5,7 @@
 * CodeSandBox: [Перейти](https://codesandbox.io/p/github/vinichDev/react-six-cities/master)
 
 ---
-
+ 
 _Не удаляйте и не изменяйте папки и файлы:_
 _`.editorconfig`, `.gitattributes`, `.gitignore`._
 
